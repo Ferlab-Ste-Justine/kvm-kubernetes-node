@@ -29,6 +29,7 @@ variable "network_id" {
 variable "ip" {
   description = "Ip address of the vm if a libvirt network is selected"
   type        = string
+  default     = ""
 }
 
 variable "mac" {
