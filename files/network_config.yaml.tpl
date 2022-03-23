@@ -11,7 +11,7 @@ ethernets:
 %{ if val.gateway != "" ~}
     gateway4: ${val.gateway}
 %{ endif ~}
-%{ if length(val.dns_servers) > 0 ~}
+%{ if length(val.dns_servers) > 0 && val.dns_servers.0 != "" ~}
     nameservers:
       addresses: [${join(",", val.dns_servers)}]
 %{ endif ~}
