@@ -26,7 +26,7 @@ write_files:
       server ${join(" ", concat([server.url], server.options))}
 %{ endfor ~}
 %{ for pool in chrony.pools ~}
-      server ${join(" ", concat([pool.url], pool.options))}
+      pool ${join(" ", concat([pool.url], pool.options))}
 %{ endfor ~}
       driftfile /var/lib/chrony/drift
       makestep ${chrony.makestep.threshold} ${chrony.makestep.limit}
