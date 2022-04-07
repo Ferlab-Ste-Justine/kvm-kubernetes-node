@@ -16,6 +16,22 @@ users:
     ssh_authorized_keys:
       - "${ssh_admin_public_key}"
 write_files:
+  #Chrony config
+%{ if chrony.enabled ~}
+  - path: /opt/chrony.conf
+    owner: root:root
+    permissions: "0444"
+    content: |
+%{ for server in chrony.servers ~}
+      server ${join(" ", concat([server.url], server.options))}
+%{ endfor ~}
+%{ for pool in chrony.pools ~}
+      server ${join(" ", concat([pool.url], pool.options))}
+%{ endfor ~}
+      driftfile /var/lib/chrony/drift
+      makestep ${chrony.makestep.threshold} ${chrony.makestep.limit}
+      rtcsync
+%{ endif ~}
   #Prometheus node exporter systemd configuration
   - path: /etc/systemd/system/node-exporter.service
     owner: root:root
@@ -37,8 +53,17 @@ write_files:
 
       [Install]
       WantedBy=multi-user.target
-
+%{ if chrony.enabled ~}
+packages:
+  - chrony
+%{ endif ~}
 runcmd:
+  #Finalize Chrony Setup
+%{ if chrony.enabled ~}
+  - cp /opt/chrony.conf /etc/chrony/chrony.conf
+  - systemctl restart chrony.service 
+%{ endif ~}
+  #Kubernetes Adjustment
   - /sbin/sysctl -w net.ipv4.conf.all.forwarding=1
   #Install prometheus node exporter as a binary managed as a systemd service
   - wget -O /opt/node_exporter.tar.gz https://github.com/prometheus/node_exporter/releases/download/v1.3.0/node_exporter-1.3.0.linux-amd64.tar.gz
