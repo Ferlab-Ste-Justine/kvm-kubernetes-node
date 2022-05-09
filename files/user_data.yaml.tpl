@@ -53,8 +53,9 @@ write_files:
 
       [Install]
       WantedBy=multi-user.target
-%{ if chrony.enabled ~}
 packages:
+  - nfs-common
+%{ if chrony.enabled ~}
   - chrony
 %{ endif ~}
 runcmd:
