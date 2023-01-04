@@ -20,22 +20,20 @@ variable "volume_id" {
   type        = string
 }
 
-variable "network_id" {
-  description = "Id of the libvirt network to connect the vm to if you plan on connecting the vm to a libvirt network"
-  type        = string
-  default     = ""
-}
-
-variable "ip" {
-  description = "Ip address of the vm if a libvirt network is selected"
-  type        = string
-  default     = ""
-}
-
-variable "mac" {
-  description = "Mac address of the vm if a libvirt network is selected"
-  type        = string
-  default     = ""
+variable "libvirt_network" {
+  description = "Parameters of the libvirt network connection if a libvirt network is used. Has the following parameters: network_id, network_name, ip, mac"
+  type = object({
+    network_name = string
+    network_id = string
+    ip = string
+    mac = string
+  })
+  default = {
+    network_name = ""
+    network_id = ""
+    ip = ""
+    mac = ""
+  }
 }
 
 variable "macvtap_interfaces" {
@@ -48,7 +46,7 @@ variable "macvtap_interfaces" {
     gateway = string,
     dns_servers = list(string),
   }))
-  default     = []
+  default = []
 }
 
 variable "cloud_init_volume_pool" {
