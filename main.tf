@@ -62,16 +62,16 @@ module "fluentd_configs" {
   install_dependencies = var.install_dependencies
   fluentd = {
     docker_services = []
-    systemd_services = [
-      {
+    systemd_services = concat(var.nfs_tunnel.enabled ? [{
         tag     = var.fluentd.nfs_tunnel_client_tag
         service = "nfs-tunnel-client"
-      },
+    }] : [],
+    [
       {
         tag     = var.fluentd.node_exporter_tag
         service = "node-exporter"
       }
-    ]
+    ])
     forward = var.fluentd.forward,
     buffer = var.fluentd.buffer
   }
