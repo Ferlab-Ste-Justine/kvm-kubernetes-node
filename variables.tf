@@ -78,6 +78,69 @@ variable "ssh_admin_public_key" {
   type        = string
 }
 
+variable "nfs_tunnel" {
+  description = "Configuration for an optional nfs tunnel over tls"
+  type        = object({
+    enabled            = bool,
+    server_domain      = string,
+    server_port        = string,
+    client_key         = string,
+    client_certificate = string,
+    ca_certificate     = string,
+    nameserver_ips     = list(string), 
+    max_connections    = number,
+    idle_timeout       = string
+  })
+  default = {
+    enabled            = false
+    server_domain      = ""
+    server_port        = ""
+    client_key         = ""
+    client_certificate = ""
+    ca_certificate     = ""
+    nameserver_ips     = []
+    max_connections    = 0
+    idle_timeout       = ""
+  }
+}
+
+variable "fluentd" {
+  description = "Fluentd configurations"
+  sensitive   = true
+  type = object({
+    enabled = bool,
+    nfs_tunnel_client_tag = string,
+    node_exporter_tag = string,
+    forward = object({
+      domain = string,
+      port = number,
+      hostname = string,
+      shared_key = string,
+      ca_cert = string,
+    }),
+    buffer = object({
+      customized = bool,
+      custom_value = string,
+    })
+  })
+  default = {
+    enabled = false
+    nfs_tunnel_client_tag = ""
+    node_exporter_tag = ""
+    forward = {
+      domain = ""
+      port = 0
+      hostname = ""
+      shared_key = ""
+      ca_cert = ""
+    }
+    buffer = {
+      customized = false
+      custom_value = ""
+    }
+  }
+}
+
 variable "chrony" {
   description = "Chrony configuration for ntp. If enabled, chrony is installed and configured, else the default image ntp settings are kept"
   type        = object({
@@ -107,4 +170,10 @@ variable "chrony" {
       limit = 0
     }
   }
+}
+
+variable "install_dependencies" {
+  description = "Whether to install all dependencies in cloud-init"
+  type = bool
+  default = true
 }

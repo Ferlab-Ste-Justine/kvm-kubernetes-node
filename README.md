@@ -31,8 +31,30 @@ The module takes the following variables as input:
 - **ssh_admin_user**: Username of the default sudo user in the image. Defaults to **ubuntu**.
 - **admin_user_password**: Optional password for the default sudo user of the image. Note that this will not enable ssh password connections, but it will allow you to log into the vm from the host using the **virsh console** command.
 - **ssh_admin_public_key**: Public part of the ssh key that will be used to login as the admin on the vm
+- **nfs_tunnel**: Configuration for an optional forwarder to an nfs server using a tls tunnel to be placed on kubernetes workers. It takes the following properties:
+  - **enabled**: Whether to enable the tunnel setup. It is disabled by default
+  - **server_domain**: The domain of the nfs server
+  - **server_port**: Port that the other side of the tunnel on the server will listen on.
+  - **client_key**: Tls private key to authentify the client
+  - **client_certificate**: Tls certificate to authentify the client
+  - **ca_certificate**: Ca certificate to authentify the server
+  - **nameserver_ips**: Optional ips of nameservers used to resolve the nfs server domain.
+- **fluentd**: Optional fluend configuration to securely route logs to a fluend node using the forward plugin. It has the following keys:
+  - **enabled**: If set the false (the default), fluentd will not be installed.
+  - **nfs_tunnel_client_tag**: Tag to assign to logs coming from the nfs tunnel client
+  - **node_exporter_tag** Tag to assign to logs coming from the prometheus node exporter
+  - **forward**: Configuration for the forward plugin that will talk to the external fluend node. It has the following keys:
+    - **domain**: Ip or domain name of the remote fluend node.
+    - **port**: Port the remote fluend node listens on
+    - **hostname**: Unique hostname identifier for the vm
+    - **shared_key**: Secret shared key with the remote fluentd node to authentify the client
+    - **ca_cert**: CA certificate that signed the remote fluentd node's server certificate (used to authentify it)
+  - **buffer**: Configuration for the buffering of outgoing fluentd traffic
+    - **customized**: Set to false to use the default buffering configurations. If you wish to customize it, set this to true.
+    - **custom_value**: Custom buffering configuration to provide that will override the default one. Should be valid fluentd configuration syntax, including the opening and closing ```<buffer>``` tags.
 - **chrony**: Optional chrony configuration for when you need a more fine-grained ntp setup on your vm. It is an object with the following fields:
   - **enabled**: If set the false (the default), chrony will not be installed and the vm ntp settings will be left to default.
   - **servers**: List of ntp servers to sync from with each entry containing two properties, **url** and **options** (see: https://chrony.tuxfamily.org/doc/4.2/chrony.conf.html#server)
   - **pools**: A list of ntp server pools to sync from with each entry containing two properties, **url** and **options** (see: https://chrony.tuxfamily.org/doc/4.2/chrony.conf.html#pool)
   - **makestep**: An object containing remedial instructions if the clock of the vm is significantly out of sync at startup. It is an object containing two properties, **threshold** and **limit** (see: https://chrony.tuxfamily.org/doc/4.2/chrony.conf.html#makestep)
+- **install_dependencies**: Whether cloud-init should install external dependencies (should be set to false if you already provide an image with the external dependencies built-in).
