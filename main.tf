@@ -109,6 +109,7 @@ locals {
             ssh_admin_public_key = var.ssh_admin_public_key
             ssh_admin_user = var.ssh_admin_user
             admin_user_password = var.admin_user_password
+            docker_registry_auth = var.docker_registry_auth
           }
         )
       },
