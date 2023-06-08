@@ -76,22 +76,6 @@ variable "ssh_admin_public_key" {
   type        = string
 }
 
-variable docker_registry_auth {
-  description = "Docker registry authentication settings"
-  type        = object({
-    enabled  = bool,
-    url      = string,
-    username = string,
-    password = string
-  })
-  default = {
-    enabled  = false
-    url      = "https://index.docker.io/v1/"
-    username = ""
-    password = ""
-  }
-}
-
 variable "nfs_tunnel" {
   description = "Configuration for an optional nfs tunnel over tls"
   type        = object({
