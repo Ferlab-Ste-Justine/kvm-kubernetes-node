@@ -50,6 +50,9 @@ The module takes the following variables as input:
 - **fluentbit**: Optional fluend configuration to securely route logs to a fluend/fluent-bit node using the forward plugin. Alternatively, configuration can be 100% dynamic by specifying the parameters of an etcd store to fetch the configuration from. It has the following keys:
   - **enabled**: If set the false (the default), fluent-bit will not be installed.
   - **nfs_tunnel_client_tag**: Tag to assign to logs coming from the nfs tunnel client
+  - **containerd_tag**: Tag to assign to logs coming from containerd. Relevant for both masters and workers.
+  - **kubelet_tag**: Tag to assign to logs coming from kubelet. Relevant for both masters and workers.
+  - **etcd_tag**: Tag to assign to logs coming from etcd. Should be set to empty string on worker nodes to disable as etcd will only be present on master nodes.
   - **node_exporter_tag** Tag to assign to logs coming from the prometheus node exporter
   - **forward**: Configuration for the forward plugin that will talk to the external fluend/fluent-bit node. It has the following keys:
     - **domain**: Ip or domain name of the remote fluend node.
