@@ -77,24 +77,24 @@ module "chrony_configs" {
   }
 }
 
-module "fluentd_configs" {
-  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//fluentd?ref=v0.8.0"
+module "fluentbit_configs" {
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//fluent-bit?ref=v0.8.0"
   install_dependencies = var.install_dependencies
-  fluentd = {
-    docker_services = []
-    systemd_services = concat(var.nfs_tunnel.enabled ? [{
-        tag     = var.fluentd.nfs_tunnel_client_tag
-        service = "nfs-tunnel-client"
-    }] : [],
-    [
-      {
-        tag     = var.fluentd.node_exporter_tag
-        service = "node-exporter"
-      }
-    ])
-    forward = var.fluentd.forward,
-    buffer = var.fluentd.buffer
+  fluentbit = {
+    metrics = var.fluentbit.metrics
+    systemd_services = concat(
+      var.nfs_tunnel.enabled ? [{
+        tag     = var.fluentbit.nfs_tunnel_client_tag
+        service = "nfs-tunnel-client.service"
+      }] : [],
+      [{
+        tag     = var.fluentbit.node_exporter_tag
+        service = "node-exporter.service"
+      }]
+    )
+    forward = var.fluentbit.forward
   }
+  etcd    = var.fluentbit.etcd
 }
 
 locals {
@@ -129,11 +129,11 @@ locals {
       content_type = "text/cloud-config"
       content      = module.chrony_configs.configuration
     }] : [],
-    var.fluentd.enabled ? [{
-      filename     = "fluentd.cfg"
+    var.fluentbit.enabled ? [{
+      filename     = "fluent_bit.cfg"
       content_type = "text/cloud-config"
-      content      = module.fluentd_configs.configuration
-    }] : [],
+      content      = module.fluentbit_configs.configuration
+    }] : []
   )
 }
 
