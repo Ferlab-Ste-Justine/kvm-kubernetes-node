@@ -87,10 +87,24 @@ module "fluentbit_configs" {
         tag     = var.fluentbit.nfs_tunnel_client_tag
         service = "nfs-tunnel-client.service"
       }] : [],
-      [{
-        tag     = var.fluentbit.node_exporter_tag
-        service = "node-exporter.service"
-      }]
+      var.fluentbit.etcd_tag != "" ? [{
+        tag     = var.fluentbit.etcd_tag
+        service = "etcd.service"
+      }] : [],
+      [
+        {
+          tag     = var.fluentbit.containerd_tag
+          service = "containerd.service"
+        },
+        {
+          tag     = var.fluentbit.kubelet_tag
+          service = "kubelet.service"
+        },
+        {
+          tag     = var.fluentbit.node_exporter_tag
+          service = "node-exporter.service"
+        }
+      ]
     )
     forward = var.fluentbit.forward
   }

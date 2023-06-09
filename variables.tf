@@ -124,6 +124,9 @@ variable "fluentbit" {
   type = object({
     enabled = bool
     nfs_tunnel_client_tag = string
+    containerd_tag = string
+    kubelet_tag = string
+    etcd_tag = string
     node_exporter_tag = string
     metrics = object({
       enabled = bool
@@ -152,6 +155,9 @@ variable "fluentbit" {
   default = {
     enabled = false
     nfs_tunnel_client_tag = ""
+    containerd_tag = ""
+    kubelet_tag = ""
+    etcd_tag = ""
     node_exporter_tag = ""
     metrics = {
       enabled = false
