@@ -77,6 +77,26 @@ module "chrony_configs" {
   }
 }
 
+module "vault_agent_configs" {
+  source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//vault-agent?ref=feat/vault-agent"
+  install_dependencies = var.vault_agent.install_dependencies
+  vault_agent = {
+    enabled              = var.vault_agent.enabled
+    auth_method          = {
+      type   = var.vault_agent.auth_method.type
+      config = {
+        role_id   = var.vault_agent.auth_method.config.role_id
+        secret_id = var.vault_agent.auth_method.config.secret_id
+      }
+    }
+    vault_address        = var.vault_agent.vault_address
+    vault_ca_cert        = var.vault_agent.vault_ca_cert
+    templates            = var.vault_agent.templates
+    agent_config         = var.vault_agent.agent_config
+    release_version      = var.vault_agent.release_version
+  }
+}
+
 module "fluentbit_configs" {
   source = "git::https://github.com/Ferlab-Ste-Justine/terraform-cloudinit-templates.git//fluent-bit?ref=v0.8.0"
   install_dependencies = var.install_dependencies
@@ -117,7 +137,7 @@ locals {
         filename     = "base.cfg"
         content_type = "text/cloud-config"
         content = templatefile(
-          "${path.module}/files/user_data.yaml.tpl", 
+          "${path.module}/files/user_data.yaml.tpl",
           {
             hostname = var.name
             ssh_admin_public_key = var.ssh_admin_public_key
@@ -147,6 +167,11 @@ locals {
       filename     = "fluent_bit.cfg"
       content_type = "text/cloud-config"
       content      = module.fluentbit_configs.configuration
+    }] : [],
+    var.vault_agent.enabled ? [{
+      filename     = "vault_agent.cfg"
+      content_type = "text/cloud-config"
+      content      = module.vault_agent_configs.configuration
     }] : []
   )
 }
